@@ -1834,10 +1834,16 @@ mod cli {
             .stderr(contains(
                 "fixtures/fragments/file1.md#kebab-case-fragment-1",
             ))
-            .stdout(contains("21 Total"))
-            .stdout(contains("17 OK"))
+            // .stderr(contains("fixtures/fragments/file.html#top"))
+            // .stderr(contains("fixtures/fragments/file.html#"))
+            .stderr(contains("fixtures/fragments/file.html#embeddedtopabc"))
+            .stderr(contains("fixtures/fragments/file.html#endingtop"))
+            // .stderr(contains("fixtures/fragments/file1.md#top"))
+            // .stderr(contains("fixtures/fragments/file1.md#"))
+            .stdout(contains("29 Total"))
+            .stdout(contains("23 OK"))
             // 4 failures because of missing fragments
-            .stdout(contains("4 Errors"));
+            .stdout(contains("6 Errors"));
     }
 
     #[test]

@@ -59,19 +59,21 @@ impl FragmentChecker {
         if file_type == FileType::Markdown {
             fragment_decoded = fragment_decoded.to_lowercase().into();
         }
+        let is_emtpty_or_top_fragment = fragment.is_empty() || fragment.eq_ignore_ascii_case("top");
         match self.cache.lock().await.entry(url_without_frag) {
             Entry::Vacant(entry) => {
                 let content = fs::read_to_string(path).await?;
                 let file_frags = extractor(&content);
-                let contains_fragment =
-                    file_frags.contains(fragment) || file_frags.contains(&fragment_decoded as &str);
+                let contains_fragment = is_emtpty_or_top_fragment 
+                    || file_frags.contains(fragment)
+                    || file_frags.contains(&fragment_decoded as &str);
+                log::debug!("contains_fragment ({fragment}): {contains_fragment}");
                 entry.insert(file_frags);
                 Ok(contains_fragment)
             }
-            Entry::Occupied(entry) => {
-                Ok(entry.get().contains(fragment)
-                    || entry.get().contains(&fragment_decoded as &str))
-            }
+            Entry::Occupied(entry) => Ok(is_emtpty_or_top_fragment
+                || entry.get().contains(fragment)
+                || entry.get().contains(&fragment_decoded as &str)),
         }
     }
 
